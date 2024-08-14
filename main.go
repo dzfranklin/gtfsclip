@@ -156,7 +156,7 @@ func main() {
 		}
 	}
 
-	for trip, _ := range tripInclusion {
+	for trip := range tripInclusion {
 		for _, stop := range tripStops[trip] {
 			stopInclusion[stop] = struct{}{}
 		}
@@ -505,18 +505,18 @@ func main() {
 
 	inF, err = input.Open("feed_info.txt")
 	if err == nil {
-        outF, err = outputW.Create("feed_info.txt")
-        if err != nil {
-            panic(err)
-        }
+		outF, err = outputW.Create("feed_info.txt")
+		if err != nil {
+			panic(err)
+		}
 
-        _, err = io.Copy(outF, inF)
-        if err != nil {
-            panic(err)
-        }
+		_, err = io.Copy(outF, inF)
+		if err != nil {
+			panic(err)
+		}
 
-        fmt.Println("Wrote feed_info.txt")
-    }
+		fmt.Println("Wrote feed_info.txt")
+	}
 
 	// Copy routes.txt
 
@@ -572,53 +572,52 @@ func main() {
 	// Copy shapes.txt
 
 	inF, err = input.Open("shapes.txt")
-	if err != nil {
-		panic(err)
-	}
-	inR = csv.NewReader(inF)
+	if err == nil {
+		inR = csv.NewReader(inF)
 
-	outF, err = outputW.Create("shapes.txt")
-	if err != nil {
-		panic(err)
-	}
-	outW = csv.NewWriter(outF)
-
-	h, err = inR.Read()
-	if err != nil {
-		panic(r)
-	}
-	idI = fieldIndex(h, "shape_id")
-	err = outW.Write(h)
-	if err != nil {
-		panic(err)
-	}
-
-	count = 0
-	for {
-		row, err := inR.Read()
-		if errors.Is(err, io.EOF) {
-			break
-		} else if err != nil {
+		outF, err = outputW.Create("shapes.txt")
+		if err != nil {
 			panic(err)
 		}
-		id := row[idI]
+		outW = csv.NewWriter(outF)
 
-		if _, ok := shapeInclusion[id]; ok {
-			err := outW.Write(row)
-			if err != nil {
+		h, err = inR.Read()
+		if err != nil {
+			panic(r)
+		}
+		idI = fieldIndex(h, "shape_id")
+		err = outW.Write(h)
+		if err != nil {
+			panic(err)
+		}
+
+		count = 0
+		for {
+			row, err := inR.Read()
+			if errors.Is(err, io.EOF) {
+				break
+			} else if err != nil {
 				panic(err)
 			}
-			count++
+			id := row[idI]
+
+			if _, ok := shapeInclusion[id]; ok {
+				err := outW.Write(row)
+				if err != nil {
+					panic(err)
+				}
+				count++
+			}
 		}
-	}
 
-	outW.Flush()
-	err = outW.Error()
-	if err != nil {
-		panic(err)
-	}
+		outW.Flush()
+		err = outW.Error()
+		if err != nil {
+			panic(err)
+		}
 
-	fmt.Printf("Wrote shapes.txt (%d lines)\n", count+1)
+		fmt.Printf("Wrote shapes.txt (%d lines)\n", count+1)
+	}
 
 	// Copy stop_times.txt
 
